@@ -50,12 +50,20 @@ class Home(flask.views.MethodView):
         return flask.redirect(flask.url_for('home'))
 
 
+class Player(flask.views.MethodView):
+    @login_required
+    def get(self):
+        return flask.render_template('player.html')
+
 app.add_url_rule('/',
                  view_func=Main.as_view('index'),
                  methods=['GET', 'POST'])
 app.add_url_rule('/home/',
                  view_func=Home.as_view('home'),
                  methods=['GET', 'POST'])
+app.add_url_rule('/player/',
+                 view_func=Player.as_view('player'),
+                 methods=['GET'])
 
 
 app.debug = True
