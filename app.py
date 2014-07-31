@@ -53,7 +53,8 @@ class Home(flask.views.MethodView):
 class Player(flask.views.MethodView):
     @login_required
     def get(self):
-        return flask.render_template('player.html')
+        tracks = os.listdir('static/mp3/')
+        return flask.render_template('player.html', tracks=tracks)
 
 app.add_url_rule('/',
                  view_func=Main.as_view('index'),

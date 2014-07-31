@@ -2,6 +2,16 @@
 {% block body %}
     <h2>Playlist player</h2>
     Current playlist:
+    <audio controls="controls" autoplay="autoplay"></audio>
+    <ul>
+    	{% for track in tracks %}
+    	<li><a href="javascript:void(0);" onclick="playTrack('{{track}}')">{{track}}</a></li>
+    	{% endfor %}
+    	<script type="text/javascript">
+    	function playTrack(track) {
+    		$('audio').attr('src', '/static/mp3/' + track);
+    	}
+    	</script>
 {% endblock %}
 {% block nav %}
 <li><a href="{{url_for('index')}}">back</a></li>
