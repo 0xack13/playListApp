@@ -4,6 +4,8 @@ import functools
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from werkzeug import SharedDataMiddleware
+from flask import jsonify
+
 
 
 UPLOAD_FOLDER = 'static/mp3/'
@@ -63,18 +65,25 @@ class Player(flask.views.MethodView):
     def get(self):
         tracks = os.listdir('static/mp3/')
         return flask.render_template('player.html', tracks=tracks)
+    @login_required
     def upload_file():
         if request.method == 'POST':
+            files = []
             file = request.files['file']
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                return redirect(url_for('uploaded_file',
-                                        filename=filename))
+                #return redirect(url_for('uploaded_file', filename=filename))
+                f = {
+                'name': filename
+                }
+                files.append(f)
+                return jsonify(files=files)
         return '''
         <!doctype html>
         <title>Upload new File</title>
         <h1>Upload new File</h1>
+        <input class="fileupload" type="file" name="files[]" data-url="api/items/upload/">
         <form action="" method=post enctype=multipart/form-data>
           <p><input type=file name=file>
              <input type=submit value=Upload>
@@ -86,6 +95,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/upload', methods=['GET', 'POST'])
+@login_required
 def upload_file():
     if request.method == 'POST':
         file = request.files['file']
@@ -93,6 +103,25 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('player'))
+    return redirect(url_for('player'))
+
+@app.route('/api/items/upload/', methods=['GET', 'POST'])
+def api_upload_item_photo():
+    
+    if request.method == 'POST':
+        files = []        
+        file = request.files['files[]']
+        #if file and allowed_file(file.filename):
+        if file:
+            print 'its allowed'
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            f = {
+                'name': filename
+            }
+            files.append(f)
+            return jsonify(files=files)
+            
     return redirect(url_for('player'))
 
 app.add_url_rule('/',

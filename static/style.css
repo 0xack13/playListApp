@@ -13,3 +13,9 @@ body{
 #content {
     margin-left: 10em;
 }
+
+.bar {
+	background-color: red;
+	width: 0px;
+	height: 10px;
+}

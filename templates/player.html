@@ -8,15 +8,49 @@
     	<li><a href="javascript:void(0);" onclick="playTrack('{{track}}')">{{track}}</a></li>
     	{% endfor %}
     </ul>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file"><br /><br />
-        <input type="submit" value="Upload">
-      </form>
+        <input class="fileupload" type="file" name="files[]" data-url="/api/items/upload/">
+        <div id="progress">
+                <div class="bar" style="width: 0%;"></div>
+            </div>   
 	<script type="text/javascript">
-	function playTrack(track) {
-		$('audio').attr('src', '/static/mp3/' + track);
-	}
+    	function playTrack(track) {
+    		$('audio').attr('src', '/static/mp3/' + track);
+    	}
 	</script>
+    <!-- javascript -->
+    <script type="text/javascript">
+    $(document).ready(function(){
+           // do photo uploads
+           $('.fileupload').fileupload({
+               dataType: 'json',
+               add: function (e, data) {
+                   var picker = $(this).data('link');
+                   $(picker).children('span').html('check');
+                   data.submit();
+               },
+               done: function (e, data) {
+                   console.log("Done");
+                   location.reload();
+                   /*data.context.text('Upload finished.');            
+                   $.each(data.result.files, function (index, file) {
+                       $('<p/>').text(file.name).appendTo(document.body);
+                   });*/
+               },
+               progressall: function (e, data) {
+                   var progress = parseInt(data.loaded / data.total * 100, 10);
+                   console.log(progress);
+                   $('#progress .bar').css(
+                       'width',
+                       progress + '%'
+                   );
+                   $('.meter span').css(
+                       'width',
+                       progress + '%'
+                   );
+               }   
+           });
+    });
+    </script>
 {% endblock %}
 {% block nav %}
 <li><a href="{{url_for('index')}}">back</a></li>
